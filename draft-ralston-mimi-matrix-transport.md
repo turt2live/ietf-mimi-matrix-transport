@@ -12,9 +12,8 @@ v: 3
 area: "Applications and Real-Time"
 workgroup: "More Instant Messaging Interoperability"
 keyword:
- - next generation
- - unicorn
- - sparkling distributed ledger
+ - matrix
+ - mimi
 venue:
   group: "More Instant Messaging Interoperability"
   type: "Working Group"
