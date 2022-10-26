@@ -19,11 +19,11 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "Matrix Message Transport"
+abbrev: "Matrix Message Transport"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-ralston-mimi-matrix-transport-latest
 submissiontype: IETF  # also: "independent", "IAB", or "IRTF"
 number:
 date:
@@ -45,9 +45,9 @@ venue:
 
 author:
  -
-    fullname: Your Name Here
-    organization: Your Organization Here
-    email: your.email@example.com
+    fullname: Travis Ralston
+    organization: The Matrix.org Foundation C.I.C.
+    email: travisr@matrix.org
 
 normative:
 
