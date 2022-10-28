@@ -151,16 +151,16 @@ Table of Contents
    objects between client and server, and server and server
    (federation).  In its simplest form, a user sends an event to a room
    using the Client-Server API [CSApi], which servers then forward to
-   each other using the Federation API [SSApi].  For MIMI transport, we
-   propose using the Federation API.  The events which users send are
-   populated with information about previous events (as known to the
-   local server), "authorization events" (events which prove the sender
-   is allowed to send the event in the first place), and additional
-   server-specific signatures (to prove authenticity) by the server
-   before the event is sent to other servers.  Receiving servers check
-   the authorization events against their local view of the room to
-   decide whether the received events should be accepted, soft-failed or
-   rejected - thus providing decentralised access control semantics.
+   each other using the Federation API [SSApi].  For an interoperable
+   transport, the Federation API would be used.  The events which users
+   send are populated with information about previous events (as known
+   to the local server), "authorization events" (events which prove the
+   sender is allowed to send the event in the first place), and
+   additional server-specific signatures (to prove authenticity) by the
+   server before the event is sent to other servers.  Receiving servers
+   check the authorization events against their local view of the room
+   to decide whether the received events should be accepted, soft-failed
+   or rejected - thus providing decentralised access control semantics.
 
    An example workflow might be that Alice (@alice:s1.example.org) wants
    to invite Bob (@bob:s2.example.org) to a room over federation
@@ -228,9 +228,9 @@ Table of Contents
    transport (CS or SS APIs).  Currently a combination of Double Ratchet
    (Olm) encryption and group ratchet encryption (Megolm) is specified
    in the End-to-End Encryption section of the Client-Server API
-   [CSEncryptionApi], but Matrix over MLS (with minor bookkeeping to
-   compensate for the lack of a centralised sequencing function in
-   Matrix) is currently being specified.
+   [CSEncryptionApi], but Matrix over MLS [I-D.ietf-mls-protocol] (with
+   minor bookkeeping to compensate for the lack of a centralised
+   sequencing function in Matrix) is being specified as DMLS.  [DMLS]
 
 6.  Security Considerations
 
@@ -269,10 +269,26 @@ Table of Contents
               Client-Server API", 2022, <https://spec.matrix.org/v1.4/
               client-server-api/#end-to-end-encryption>.
 
+   [DMLS]     Chathi, H., "Decentralised MLS", Web 
+              https://gitlab.matrix.org/matrix-org/mls-ts/-
+              /blob/dd57bc25f6145ddedfb6d193f6baebf5133db7ed/
+              decentralised.org, 2021, <https://gitlab.matrix.org/
+              matrix-org/mls-ts/-
+              /blob/dd57bc25f6145ddedfb6d193f6baebf5133db7ed/
+              decentralised.org>.
+
    [GitterMigration]
               Hodgson, M., "Gitter now speaks Matrix!", 2020,
               <https://matrix.org/blog/2020/12/07/gitter-now-speaks-
               matrix>.
+
+   [I-D.ietf-mls-protocol]
+              Barnes, R., Beurdouche, B., Robert, R., Millican, J.,
+              Omara, E., and K. Cohn-Gordon, "The Messaging Layer
+              Security (MLS) Protocol", Work in Progress, Internet-
+              Draft, draft-ietf-mls-protocol-16, 11 July 2022,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-mls-
+              protocol-16>.
 
    [MxFoundation]
               The Matrix.org Foundation C.I.C., "The Matrix.org
