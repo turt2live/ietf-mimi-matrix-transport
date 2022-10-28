@@ -137,7 +137,7 @@ A key part of this eventually consistent model is that a server can go offline (
 
 Practically, this looks like:
 
-```
+~~~
 
 Room on server A sent message A1,       The same room on server B has received
 then sent A2, and received C1 from      A1 and A2, but not C1, e.g. due to
@@ -175,7 +175,8 @@ Server B sees that A3 refers to the missing event C1, and pulls it from A:
 Typically, get_missing_events isn't needed, given servers push all events
 to all participating servers by default.
 
-```
+~~~
+Figure 1
 
 # Interoperability
 
