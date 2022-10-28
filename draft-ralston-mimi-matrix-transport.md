@@ -34,6 +34,13 @@ author:
 
 normative:
   RFC1123:
+  SSApi:
+    target: https://spec.matrix.org/v1.4/server-server-api/
+    title: "Federation API"
+    date: 2022
+    author:
+      - org: The Matrix.org Foundation C.I.C.
+informative:
   CSInviteApi:
     target: https://spec.matrix.org/v1.4/client-server-api/#post_matrixclientv3roomsroomidinvite
     title: "POST /_matrix/client/v3/rooms/:roomId/invite | Client-Server API"
@@ -46,7 +53,6 @@ normative:
     date: 2022
     author:
       - org: The Matrix.org Foundation C.I.C.
-informative:
   GitterMigration:
     target: https://matrix.org/blog/2020/12/07/gitter-now-speaks-matrix
     title: "Gitter now speaks Matrix!"
@@ -63,12 +69,6 @@ informative:
   SSStateResAlgo:
     target: https://spec.matrix.org/v1.4/server-server-api/#room-state-resolution
     title: "Room State Resolution | Federation API"
-    date: 2022
-    author:
-      - org: The Matrix.org Foundation C.I.C.
-  SSApi:
-    target: https://spec.matrix.org/v1.4/server-server-api/
-    title: "Federation API"
     date: 2022
     author:
       - org: The Matrix.org Foundation C.I.C.
