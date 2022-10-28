@@ -116,8 +116,8 @@ cases and routine failures that often come up during implementation, such as han
 actors (intentional or accidental), and recovering from failure states.
 
 Matrix solves this by providing a highest-common denominator messaging layer between current real-world messaging systems, which
-expresses events in an authenticated Directed Acyclic Graph that is incrementally replicated between untrusted participating servers,
-providing decentralised access control without single points of control. This ensures that all participants converge on a consistent
+expresses events in an authenticated Directed Acyclic Graph (DAG) that is incrementally replicated between untrusted participating servers,
+providing decentralized access control without single points of control. This ensures that all participants converge on a consistent
 view of room history as rapidly as possible, including key/value state, even in the face of bad actors or network partitions - rather
 than all participants piecing together partial independent views of a room from pubsub streams or other sources. This provides
 aggressive resilience to network partitions, suitable even for the harshest denied, disrupted, intermittent and high latency environments
@@ -134,12 +134,12 @@ of the Matrix protocol as it relates to MIMI.
 Within Matrix there are four key primitives needed for cross-server communication:
 
 1. Homeservers (or simply "servers"), identified as {{RFC1123}} Host Names with extensions for IPv6, which act as a namespace for
-   holding Users and copies of Rooms.
+   holding Users and replicated copies of Rooms.
 2. Rooms, identified as `!localpart:example.org`, consist of the Directed Acyclic Graph (DAG) for Events sent by Users. The DAG is
-   replicated across all Homeservers participating in that room. It can be thought of as a pubsub topic with additional semantics to
+   replicated across all Homeservers participating in that Room. It can be thought of as a pubsub topic with additional semantics to
    access and authenticate message history and key/value state.
 3. Events, identified as `$base64HashOfItself`, have a type (`m.room.message` or `m.room.encrypted`, for example) and are sent by
-   Users, added to the Room by Homeservers. State Events are versioned key/value data which are pinned in the room, usually tracking
+   Users, added to the Room (DAG) by Homeservers. State Events are versioned key/value data which are pinned in the room, usually tracking
    information about the room itself (membership, room name, topic, etc). State Events can be overwritten while other Events can not
    (though normal Events can be "edited" by sending a new Event which points to the original Event).
 4. Users, identified as `@localpart:example.org`, can have multiple devices (logged-in sessions) to join/leave Rooms and send Events
@@ -156,7 +156,7 @@ using the Federation API {{SSApi}}. For an interoperable transport, the Federati
 populated with information about previous events (as known to the local server), "authorization events" (events which prove the sender
 is allowed to send the event in the first place), and additional server-specific signatures (to prove authenticity) by the server before
 the event is sent to other servers.  Receiving servers check the authorization events against their local view of the room to decide
-whether the received events should be accepted, soft-failed or rejected - thus providing decentralised access control semantics.
+whether the received event should be accepted, soft-failed or rejected - thus providing decentralized access control semantics.
 
 An example workflow might be that Alice (`@alice:s1.example.org`) wants to invite Bob (`@bob:s2.example.org`) to a room over federation
 (because the users are on different servers). Alice's client would send an `/invite` {{CSInviteApi}} request for `@bob:s2.example.org` in
@@ -220,7 +220,7 @@ Figure 1
 
 # Interoperability
 
-Matrix's split of Federation and Client-Server APIs allows homeservers to implement the API surface which is most relevant for its
+Matrix's split of Federation and Client-Server APIs allow homeservers to implement the API surface which is most relevant for its
 application.  For interoperability, only the Federation API is relevant. The APIs have been designed to intrinsically support load
 balancing and active/active horizontal scaling - for instance, it's valid for different parts of a server to race together when sending
 a message in a room (causing a temporary fork in the room's event DAG, same as if the race happened against a remote server), avoiding
@@ -237,10 +237,10 @@ to handle application-specific traffic on one end and Matrix federation on the o
 
 # Encryption
 
-End-to-end Encryption is deliberately layered on top of the Matrix transport (CS or SS APIs).  Currently a combination of Double Ratchet
-(Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the Client-Server API
-{{CSEncryptionApi}}, but Matrix over MLS {{?I-D.ietf-mls-protocol}} (with minor bookkeeping to compensate for the lack of a centralised
-sequencing function in Matrix) is being specified as DMLS. {{DMLS}}
+End-to-end Encryption is deliberately layered on top of the Matrix transport (Client-Server or Federation APIs).  Currently a combination
+of Double Ratchet (Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the
+Client-Server API {{CSEncryptionApi}}, but Matrix over MLS {{?I-D.ietf-mls-protocol}} (with minor bookkeeping to compensate for the lack
+of a centralised sequencing function in Matrix) is being specified as DMLS. {{DMLS}}
 
 # Security Considerations
 
