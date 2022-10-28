@@ -5,7 +5,7 @@
 More Instant Messaging Interoperability                       T. Ralston
 Internet-Draft                                                M. Hodgson
 Intended status: Informational          The Matrix.org Foundation C.I.C.
-Expires: 30 April 2023                                   27 October 2022
+Expires: 1 May 2023                                      28 October 2022
 
 
                         Matrix Message Transport
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 April 2023.
+   This Internet-Draft will expire on 1 May 2023.
 
 Copyright Notice
 
@@ -86,16 +86,22 @@ Table of Contents
    edge cases and routine failures that often come up during
    implementation, such as handling of network partitions/disconnects,
    malicious actors (intentional or accidental), and recovering from
-   failure states.  Matrix solves this by providing a highest-common
-   denominator messaging layer between current real-world messaging
-   systems, which expresses events in an authenticated Directed Acyclic
-   Graph that is incrementally replicated between untrusted
-   participating servers, providing decentralised access control without
-   single points of control.  This ensures that all participants
-   converge on a consistent view of room history as rapidly as possible,
-   including key/value state, even in the face of bad actors or network
-   partitions - rather than all participants piecing together partial
-   independent views of a room from pubsub streams or other sources.
+   failure states.
+
+   Matrix solves this by providing a highest-common denominator
+   messaging layer between current real-world messaging systems, which
+   expresses events in an authenticated Directed Acyclic Graph that is
+   incrementally replicated between untrusted participating servers,
+   providing decentralised access control without single points of
+   control.  This ensures that all participants converge on a consistent
+   view of room history as rapidly as possible, including key/value
+   state, even in the face of bad actors or network partitions - rather
+   than all participants piecing together partial independent views of a
+   room from pubsub streams or other sources.  This provides aggressive
+   resilience to network partitions, suitable even for the harshest
+   denied, disrupted, intermittent and high latency environments (e.g.
+   P2P networks overlaying Bluetooth or HF carriers; maritime or space
+   deployments).
 
    Matrix (https://spec.matrix.org/v1.4/) is an open standard first
    created in 2014 to define interoperable, decentralized, secure
@@ -146,15 +152,16 @@ Table of Contents
    using the Client-Server API (https://spec.matrix.org/v1.4/client-
    server-api/), which servers then forward to each other using the
    Federation API (https://spec.matrix.org/v1.4/server-server-api/).
-   The events which users send are populated with information about
-   previous events (as known to the local server), "authorization
-   events" (events which prove the sender is allowed to send the event
-   in the first place), and additional server-specific signatures (to
-   prove authenticity) by the server before the event is sent to other
-   servers.  Receiving servers check the authorization events against
-   their local view of the room to decide whether the received events
-   should be accepted, soft-failed or rejected - thus providing
-   decentralised access control semantics.
+   For MIMI transport, we propose using the Federation API.  The events
+   which users send are populated with information about previous events
+   (as known to the local server), "authorization events" (events which
+   prove the sender is allowed to send the event in the first place),
+   and additional server-specific signatures (to prove authenticity) by
+   the server before the event is sent to other servers.  Receiving
+   servers check the authorization events against their local view of
+   the room to decide whether the received events should be accepted,
+   soft-failed or rejected - thus providing decentralised access control
+   semantics.
 
    An example workflow might be that Alice (@alice:s1.example.org) wants
    to invite Bob (@bob:s2.example.org) to a room over federation
@@ -195,19 +202,21 @@ Table of Contents
 
    Matrix's split of Federation and Client-Server APIs allows
    homeservers to implement the API surface which is most relevant for
-   its application, and apply industry standard load balancing
-   techniques for handling larger deployments.  Particularly, the APIs
-   have been designed to intrinsically support active/active horizontal
-   scaling - for instance, it's valid for different parts of a server to
-   race together when sending a message in a room (causing a temporary
-   fork in the room's event DAG, same as if the race happened against a
-   remote server).  The steps needed for an existing system to be
-   interoperable with another over Matrix would mean implementing the
-   Federation API and storing minimal information about the room's
-   current state (state events (including members), a few of the most
-   recent event identifiers seen, etc) and hooking that up to their
-   existing application.  An example of this happening is Gitter
-   showcasing Matrix interoperability back in 2020
+   its application.  For interoperability, only the Federation API is
+   relevant.  The APIs have been designed to intrinsically support load
+   balancing and active/active horizontal scaling - for instance, it's
+   valid for different parts of a server to race together when sending a
+   message in a room (causing a temporary fork in the room's event DAG,
+   same as if the race happened against a remote server), avoiding the
+   need for global locks within the server.
+
+   The steps needed for an existing system to be interoperable with
+   another over Matrix would mean implementing the Federation API and
+   storing minimal information about the room's current state (state
+   events (including members), a few of the most recent event
+   identifiers seen, etc) and hooking that up to their existing
+   application.  An example of this happening is Gitter showcasing
+   Matrix interoperability back in 2020
    (https://matrix.org/blog/2020/12/07/gitter-now-speaks-matrix).
 
    As was the case with Gitter, existing messaging applications could
