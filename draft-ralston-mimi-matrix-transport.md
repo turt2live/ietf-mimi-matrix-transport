@@ -90,6 +90,17 @@ informative:
     date: 2019
     author:
       - org: The Matrix.org Foundation C.I.C.
+  DMLS:
+    target: https://gitlab.matrix.org/matrix-org/mls-ts/-/blob/dd57bc25f6145ddedfb6d193f6baebf5133db7ed/decentralised.org
+    title: "Decentralised MLS"
+    author:
+      - name: Hubert Chathi
+        org: The Matrix.org Foundation C.I.C.
+    date: 2021
+    seriesinfo:
+      Web: https://gitlab.matrix.org/matrix-org/mls-ts/-/blob/dd57bc25f6145ddedfb6d193f6baebf5133db7ed/decentralised.org
+    format:
+      ORG: https://gitlab.matrix.org/matrix-org/mls-ts/-/blob/dd57bc25f6145ddedfb6d193f6baebf5133db7ed/decentralised.org
 
 --- abstract
 
@@ -134,7 +145,7 @@ As was the case with Gitter, existing messaging applications could deploy a home
 
 # Encryption
 
-End-to-end Encryption is deliberately layered on top of the Matrix transport (CS or SS APIs).  Currently a combination of Double Ratchet (Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the Client-Server API {{CSEncryptionApi}}, but Matrix over MLS (with minor bookkeeping to compensate for the lack of a centralised sequencing function in Matrix) is currently being specified.
+End-to-end Encryption is deliberately layered on top of the Matrix transport (CS or SS APIs).  Currently a combination of Double Ratchet (Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the Client-Server API {{CSEncryptionApi}}, but Matrix over MLS {{?I-D.ietf-mls-protocol}} (with minor bookkeeping to compensate for the lack of a centralised sequencing function in Matrix) is being specified as DMLS. {{DMLS}}
 
 # Security Considerations
 
