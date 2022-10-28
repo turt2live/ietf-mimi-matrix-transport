@@ -121,7 +121,7 @@ Matrix {{MxSpec}} is an open standard first created in 2014 to define interopera
 Within Matrix there are four key primitives needed for cross-server communication:
 
 1. Homeservers (or simply "servers"), identified as {{RFC1123}} Host Names with extensions for IPv6, which act as a namespace for holding Users and copies of Rooms.
-2. Rooms, identified as `!localpart:example.org`, consist of the Directed Acyclic Graph (DAG) for Events sent by Users. The DAG is replicated across all Homeservers participating in that room.
+2. Rooms, identified as `!localpart:example.org`, consist of the Directed Acyclic Graph (DAG) for Events sent by Users. The DAG is replicated across all Homeservers participating in that room. It can be thought of as a pubsub topic with additional semantics to access and authenticate message history and key/value state.
 3. Events, identified as `$base64HashOfItself`, have a type (`m.room.message` or `m.room.encrypted`, for example) and are sent by Users, added to the Room by Homeservers. State Events are versioned key/value data which are pinned in the room, usually tracking information about the room itself (membership, room name, topic, etc). State Events can be overwritten while other Events can not (though normal Events can be "edited" by sending a new Event which points to the original Event).
 4. Users, identified as `@localpart:example.org`, can have multiple devices (logged-in sessions) to join/leave Rooms and send Events to those rooms.
 
@@ -134,6 +134,49 @@ Matrix uses a set of RPC APIs (typically over HTTPS) to pass JSON objects betwee
 An example workflow might be that Alice (`@alice:s1.example.org`) wants to invite Bob (`@bob:s2.example.org`) to a room over federation (because the users are on different servers). Alice's client would send an `/invite` {{CSInviteApi}} request for `@bob:s2.example.org` in that room, which causes `s1.example.org` to send a similar `/invite` {{SSInviteApi}} request over federation to `s2.example.org`. When Bob has accepted the invite (by joining the room, using similar endpoints), the room's state and recent history are replicated to Bob's server and sent to Bob's client. Both Alice and Bob can now send events, including `m.room.message` events for instant messaging cases, and their servers will build a DAG off of them.  Servers by default push events to each other, but can also pull events from each other in order to fill holes in their DAG.
 
 A key part of this eventually consistent model is that a server can go offline (for any reason, including being affected by a Denial of Service (DoS) attack, network partition, or being turned off) and other servers in the room are not affected. The other servers can continue to send events into the room and amongst each other while the other server is offline. When that server comes back online, it will have the events it missed efficiently synchronized to it by the other servers. Similarly, if the offline server was operational but unable to send events to other servers, it can continue sending its own events to the room and have those events be "merged" with the other servers' events when network connectivity is restored. Conflicts with state events (two or more changes to the room state at the same time or by temporarily diverged servers, often due to network connectivity issues) are resolved using an appropriate State Resolution Algorithm {{SSStateResAlgo}}. The state resolution algorithm is not covered here for brevity, and would likely be its own document.
+
+Practically, this looks like:
+
+~~~
+
+Room on server A sent message A1,       The same room on server B has received
+then sent A2, and received C1 from      A1 and A2, but not C1, e.g. due to
+server C which raced with A2 and so     network connectivity problems.
+follows A1.
+     __________                                              __________
+    '          '                                            '          '
+    '    A1    '                                            '    A1    '
+    '   /  \   '                                            '   /      '
+    '  A2  C1  '                                            '  A2      '
+    '__________'                                            '__________'
+
+Server A sends another message, A3:
+
+     __________                                              __________
+    '          '                                            '          '
+    '    A1    '                                            '    A1    '
+    '   /  \   '                                            '   /      '
+    '  A2  C1  '------------------------------------------->'  A2   ?  '
+    '   \  /   '  HTTP PUT                                  '   \  /   '
+    '    A3    '  /_matrix/federation/v1/send/{txnId}       '    A3    '
+    '__________'  A3                                        '__________'
+
+Server B sees that A3 refers to the missing event C1, and pulls it from A:
+
+     __________                                              __________
+    '          '                                            '          '
+    '    A1    '                                            '    A1    '
+    '   /  \   '                                            '   /  \   '
+    '  A2  C1  '<-------------------------------------------'  A2   C1 '
+    '   \  /   '  HTTP GET                                  '   \  /   '
+    '    A3    '  /_matrix/federation/v1/get_missing_events '    A3    '
+    '__________'  C1                                        '__________'
+
+Typically, get_missing_events isn't needed, given servers push all events
+to all participating servers by default.
+
+~~~
+Figure 1
 
 # Interoperability
 
