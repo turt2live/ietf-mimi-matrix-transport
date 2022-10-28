@@ -1186,9 +1186,22 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Designing transports for interoperable messaging can often be a race towards the lowest common denominator among the systems one is attempting to interoperate. In addition to considering those systems' capabilities, the design must also account for a number of edge cases and routine failures that often come up during implementation, such as handling of network partitions/disconnects, malicious actors (intentional or accidental), and recovering from failure states.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Matrix solves this by providing a highest-common denominator messaging layer between current real-world messaging systems, which expresses events in an authenticated Directed Acyclic Graph that is incrementally replicated between untrusted participating servers, providing decentralised access control without single points of control. This ensures that all participants converge on a consistent view of room history as rapidly as possible, including key/value state, even in the face of bad actors or network partitions - rather than all participants piecing together partial independent views of a room from pubsub streams or other sources. This provides aggressive resilience to network partitions, suitable even for the harshest denied, disrupted, intermittent and high latency environments (e.g. P2P networks overlaying Bluetooth or HF carriers; maritime or space deployments).<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Matrix <span>[<a href="#MxSpec" class="cite xref">MxSpec</a>]</span> is an open standard first created in 2014 to define interoperable, decentralized, secure communication. Matrix exited beta in June 2019, and having been actively maintained and improved since under an open governance model <span>[<a href="#MxFoundation" class="cite xref">MxFoundation</a>]</span>, a subset of the open standard fits extremely well within the More Instant Messaging Interoperability (MIMI) working group's efforts to establish standards for interoperable modern messaging applications. This document focuses on the transport (message- or event-passing) portion of the Matrix protocol as it relates to MIMI.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-1">Designing transports for interoperable messaging can often be a race towards the lowest common denominator among the systems one is
+attempting to interoperate. In addition to considering those systems' capabilities, the design must also account for a number of edge
+cases and routine failures that often come up during implementation, such as handling of network partitions/disconnects, malicious
+actors (intentional or accidental), and recovering from failure states.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Matrix solves this by providing a highest-common denominator messaging layer between current real-world messaging systems, which
+expresses events in an authenticated Directed Acyclic Graph (DAG) that is incrementally replicated between untrusted participating servers,
+providing decentralized access control without single points of control. This ensures that all participants converge on a consistent
+view of room history as rapidly as possible, including key/value state, even in the face of bad actors or network partitions - rather
+than all participants piecing together partial independent views of a room from pubsub streams or other sources. This provides
+aggressive resilience to network partitions, suitable even for the harshest denied, disrupted, intermittent and high latency environments
+(for example, P2P networks overlaying Bluetooth or HF carriers; maritime or space deployments).<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Matrix <span>[<a href="#MxSpec" class="cite xref">MxSpec</a>]</span> is an open standard first created in 2014 to define interoperable, decentralized, secure communication. Matrix exited
+beta in June 2019, and having been actively maintained and improved since under an open governance model <span>[<a href="#MxFoundation" class="cite xref">MxFoundation</a>]</span>, a subset of
+the open standard fits extremely well within the More Instant Messaging Interoperability (MIMI) working group's efforts to establish
+standards for interoperable modern messaging applications. This document focuses on the transport (message- or event-passing) portion
+of the Matrix protocol as it relates to MIMI.<a href="#section-1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="matrix-primitives">
@@ -1198,16 +1211,24 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
       </h2>
 <p id="section-2-1">Within Matrix there are four key primitives needed for cross-server communication:<a href="#section-2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-2-2">
-<li id="section-2-2.1">Homeservers (or simply "servers"), identified as <span>[<a href="#RFC1123" class="cite xref">RFC1123</a>]</span> Host Names with extensions for IPv6, which act as a namespace for holding Users and copies of Rooms.<a href="#section-2-2.1" class="pilcrow">¶</a>
+<li id="section-2-2.1">Homeservers (or simply "servers"), identified as <span>[<a href="#RFC1123" class="cite xref">RFC1123</a>]</span> Host Names with extensions for IPv6, which act as a namespace for
+holding Users and replicated copies of Rooms.<a href="#section-2-2.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.2">Rooms, identified as <code>!localpart:example.org</code>, consist of the Directed Acyclic Graph (DAG) for Events sent by Users. The DAG is replicated across all Homeservers participating in that room. It can be thought of as a pubsub topic with additional semantics to access and authenticate message history and key/value state.<a href="#section-2-2.2" class="pilcrow">¶</a>
+        <li id="section-2-2.2">Rooms, identified as <code>!localpart:example.org</code>, consist of the Directed Acyclic Graph (DAG) for Events sent by Users. The DAG is
+replicated across all Homeservers participating in that Room. It can be thought of as a pubsub topic with additional semantics to
+access and authenticate message history and key/value state.<a href="#section-2-2.2" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.3">Events, identified as <code>$base64HashOfItself</code>, have a type (<code>m.room.message</code> or <code>m.room.encrypted</code>, for example) and are sent by Users, added to the Room by Homeservers. State Events are versioned key/value data which are pinned in the room, usually tracking information about the room itself (membership, room name, topic, etc). State Events can be overwritten while other Events can not (though normal Events can be "edited" by sending a new Event which points to the original Event).<a href="#section-2-2.3" class="pilcrow">¶</a>
+        <li id="section-2-2.3">Events, identified as <code>$base64HashOfItself</code>, have a type (<code>m.room.message</code> or <code>m.room.encrypted</code>, for example) and are sent by
+Users, added to the Room (DAG) by Homeservers. State Events are versioned key/value data which are pinned in the room, usually tracking
+information about the room itself (membership, room name, topic, etc). State Events can be overwritten while other Events can not
+(though normal Events can be "edited" by sending a new Event which points to the original Event).<a href="#section-2-2.3" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.4">Users, identified as <code>@localpart:example.org</code>, can have multiple devices (logged-in sessions) to join/leave Rooms and send Events to those rooms.<a href="#section-2-2.4" class="pilcrow">¶</a>
+        <li id="section-2-2.4">Users, identified as <code>@localpart:example.org</code>, can have multiple devices (logged-in sessions) to join/leave Rooms and send Events
+to those rooms.<a href="#section-2-2.4" class="pilcrow">¶</a>
 </li>
       </ol>
-<p id="section-2-3">Other primitives do exist in Matrix, such as Devices for users, however they are not directly relevant to this document's purpose and have been excluded.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-3">Other primitives do exist in Matrix, such as Devices for users, however they are not directly relevant to this document's purpose and
+have been excluded.<a href="#section-2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="federation-basics-and-eventual-consistency">
@@ -1215,9 +1236,28 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
       <h2 id="name-federation-basics-and-event">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-federation-basics-and-event" class="section-name selfRef">Federation Basics and Eventual Consistency</a>
       </h2>
-<p id="section-3-1">Matrix uses a set of RPC APIs (typically over HTTPS) to pass JSON objects between client and server, and server and server (federation). In its simplest form, a user sends an event to a room using the Client-Server API <span>[<a href="#CSApi" class="cite xref">CSApi</a>]</span>, which servers then forward to each other using the Federation API <span>[<a href="#SSApi" class="cite xref">SSApi</a>]</span>. For an interoperable transport, the Federation API would be used. The events which users send are populated with information about previous events (as known to the local server), "authorization events" (events which prove the sender is allowed to send the event in the first place), and additional server-specific signatures (to prove authenticity) by the server before the event is sent to other servers.  Receiving servers check the authorization events against their local view of the room to decide whether the received events should be accepted, soft-failed or rejected - thus providing decentralised access control semantics.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">An example workflow might be that Alice (<code>@alice:s1.example.org</code>) wants to invite Bob (<code>@bob:s2.example.org</code>) to a room over federation (because the users are on different servers). Alice's client would send an <code>/invite</code> <span>[<a href="#CSInviteApi" class="cite xref">CSInviteApi</a>]</span> request for <code>@bob:s2.example.org</code> in that room, which causes <code>s1.example.org</code> to send a similar <code>/invite</code> <span>[<a href="#SSInviteApi" class="cite xref">SSInviteApi</a>]</span> request over federation to <code>s2.example.org</code>. When Bob has accepted the invite (by joining the room, using similar endpoints), the room's state and recent history are replicated to Bob's server and sent to Bob's client. Both Alice and Bob can now send events, including <code>m.room.message</code> events for instant messaging cases, and their servers will build a DAG off of them.  Servers by default push events to each other, but can also pull events from each other in order to fill holes in their DAG.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A key part of this eventually consistent model is that a server can go offline (for any reason, including being affected by a Denial of Service (DoS) attack, network partition, or being turned off) and other servers in the room are not affected. The other servers can continue to send events into the room and amongst each other while the other server is offline. When that server comes back online, it will have the events it missed efficiently synchronized to it by the other servers. Similarly, if the offline server was operational but unable to send events to other servers, it can continue sending its own events to the room and have those events be "merged" with the other servers' events when network connectivity is restored. Conflicts with state events (two or more changes to the room state at the same time or by temporarily diverged servers, often due to network connectivity issues) are resolved using an appropriate State Resolution Algorithm <span>[<a href="#SSStateResAlgo" class="cite xref">SSStateResAlgo</a>]</span>. The state resolution algorithm is not covered here for brevity, and would likely be its own document.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-1">Matrix uses a set of RPC APIs (typically over HTTPS) to pass JSON objects between client and server, and server and server (federation).
+In its simplest form, a user sends an event to a room using the Client-Server API <span>[<a href="#CSApi" class="cite xref">CSApi</a>]</span>, which servers then forward to each other
+using the Federation API <span>[<a href="#SSApi" class="cite xref">SSApi</a>]</span>. For an interoperable transport, the Federation API would be used. The events which users send are
+populated with information about previous events (as known to the local server), "authorization events" (events which prove the sender
+is allowed to send the event in the first place), and additional server-specific signatures (to prove authenticity) by the server before
+the event is sent to other servers.  Receiving servers check the authorization events against their local view of the room to decide
+whether the received event should be accepted, soft-failed or rejected - thus providing decentralized access control semantics.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">An example workflow might be that Alice (<code>@alice:s1.example.org</code>) wants to invite Bob (<code>@bob:s2.example.org</code>) to a room over federation
+(because the users are on different servers). Alice's client would send an <code>/invite</code> <span>[<a href="#CSInviteApi" class="cite xref">CSInviteApi</a>]</span> request for <code>@bob:s2.example.org</code> in
+that room, which causes <code>s1.example.org</code> to send a similar <code>/invite</code> <span>[<a href="#SSInviteApi" class="cite xref">SSInviteApi</a>]</span> request over federation to <code>s2.example.org</code>. When Bob
+has accepted the invite (by joining the room, using similar endpoints), the room's state and recent history are replicated to Bob's server
+and sent to Bob's client. Both Alice and Bob can now send events, including <code>m.room.message</code> events for instant messaging cases, and their
+servers will build a DAG off of them.  Servers by default push events to each other, but can also pull events from each other in order to
+fill holes in their DAG.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">A key part of this eventually consistent model is that a server can go offline (for any reason, including being affected by a Denial of
+Service (DoS) attack, network partition, or being turned off) and other servers in the room are not affected. The other servers can continue
+to send events into the room and amongst each other while the other server is offline. When that server comes back online, it will have the
+events it missed efficiently synchronized to it by the other servers. Similarly, if the offline server was operational but unable to send
+events to other servers, it can continue sending its own events to the room and have those events be "merged" with the other servers' events
+when network connectivity is restored. Conflicts with state events (two or more changes to the room state at the same time or by temporarily
+diverged servers, often due to network connectivity issues) are resolved using an appropriate State Resolution Algorithm <span>[<a href="#SSStateResAlgo" class="cite xref">SSStateResAlgo</a>]</span>.
+The state resolution algorithm is not covered here for brevity, and would likely be its own document.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">Practically, this looks like:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-5">
 <pre>
@@ -1267,9 +1307,18 @@ to all participating servers by default.
       <h2 id="name-interoperability">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-interoperability" class="section-name selfRef">Interoperability</a>
       </h2>
-<p id="section-4-1">Matrix's split of Federation and Client-Server APIs allows homeservers to implement the API surface which is most relevant for its application.  For interoperability, only the Federation API is relevant. The APIs have been designed to intrinsically support load balancing and active/active horizontal scaling - for instance, it's valid for different parts of a server to race together when sending a message in a room (causing a temporary fork in the room's event DAG, same as if the race happened against a remote server), avoiding the need for global locks within the server.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">The steps needed for an existing system to be interoperable with another over Matrix would mean implementing the Federation API and storing minimal information about the room's current state (state events (including members), a few of the most recent event identifiers seen, etc) and hooking that up to their existing application. An example of this happening is Gitter showcasing Matrix interoperability back in 2020 <span>[<a href="#GitterMigration" class="cite xref">GitterMigration</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">As was the case with Gitter, existing messaging applications could deploy a homeserver using software which already exists to rapidly get connected to the Matrix network. Later stages of implementation for messaging applications might include writing proprietary software to handle application-specific traffic on one end and Matrix federation on the other, optimizing for internal scaling requirements.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-1">Matrix's split of Federation and Client-Server APIs allow homeservers to implement the API surface which is most relevant for its
+application.  For interoperability, only the Federation API is relevant. The APIs have been designed to intrinsically support load
+balancing and active/active horizontal scaling - for instance, it's valid for different parts of a server to race together when sending
+a message in a room (causing a temporary fork in the room's event DAG, same as if the race happened against a remote server), avoiding
+the need for global locks within the server.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">The steps needed for an existing system to be interoperable with another over Matrix would mean implementing the Federation API and
+storing minimal information about the room's current state (state events (including members), a few of the most recent event identifiers
+seen, etc) and hooking that up to their existing application. An example of this happening is Gitter showcasing Matrix interoperability
+back in 2020 <span>[<a href="#GitterMigration" class="cite xref">GitterMigration</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">As was the case with Gitter, existing messaging applications could deploy a homeserver using software which already exists to rapidly
+get connected to the Matrix network. Later stages of implementation for messaging applications might include writing proprietary software
+to handle application-specific traffic on one end and Matrix federation on the other, optimizing for internal scaling requirements.<a href="#section-4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="encryption">
@@ -1277,7 +1326,10 @@ to all participating servers by default.
       <h2 id="name-encryption">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-encryption" class="section-name selfRef">Encryption</a>
       </h2>
-<p id="section-5-1">End-to-end Encryption is deliberately layered on top of the Matrix transport (CS or SS APIs).  Currently a combination of Double Ratchet (Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the Client-Server API <span>[<a href="#CSEncryptionApi" class="cite xref">CSEncryptionApi</a>]</span>, but Matrix over MLS <span>[<a href="#I-D.ietf-mls-protocol" class="cite xref">I-D.ietf-mls-protocol</a>]</span> (with minor bookkeeping to compensate for the lack of a centralised sequencing function in Matrix) is being specified as DMLS. <span>[<a href="#DMLS" class="cite xref">DMLS</a>]</span><a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">End-to-end Encryption is deliberately layered on top of the Matrix transport (Client-Server or Federation APIs).  Currently a combination
+of Double Ratchet (Olm) encryption and group ratchet encryption (Megolm) is specified in the End-to-End Encryption section of the
+Client-Server API <span>[<a href="#CSEncryptionApi" class="cite xref">CSEncryptionApi</a>]</span>, but Matrix over MLS <span>[<a href="#I-D.ietf-mls-protocol" class="cite xref">I-D.ietf-mls-protocol</a>]</span> (with minor bookkeeping to compensate for the lack
+of a centralised sequencing function in Matrix) is being specified as DMLS. <span>[<a href="#DMLS" class="cite xref">DMLS</a>]</span><a href="#section-5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
