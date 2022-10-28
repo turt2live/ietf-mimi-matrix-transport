@@ -283,23 +283,13 @@ to all participating servers by default.
 
 7.1.  Normative References
 
-   [CSInviteApi]
-              The Matrix.org Foundation C.I.C., "POST
-              /_matrix/client/v3/rooms/:roomId/invite | Client-Server
-              API", 2022, <https://spec.matrix.org/v1.4/client-server-
-              api/#post_matrixclientv3roomsroomidinvite>.
-
    [RFC1123]  Braden, R., Ed., "Requirements for Internet Hosts -
               Application and Support", STD 3, RFC 1123,
               DOI 10.17487/RFC1123, October 1989,
               <https://www.rfc-editor.org/rfc/rfc1123>.
 
-   [SSInviteApi]
-              The Matrix.org Foundation C.I.C., "POST
-              /_matrix/federation/v2/invite/:roomId/:eventId |
-              Federation API", 2022, <https://spec.matrix.org/v1.4/
-              server-server-
-              api/#put_matrixfederationv2inviteroomideventid>.
+   [SSApi]    The Matrix.org Foundation C.I.C., "Federation API", 2022,
+              <https://spec.matrix.org/v1.4/server-server-api/>.
 
 7.2.  Informative References
 
@@ -310,6 +300,12 @@ to all participating servers by default.
               The Matrix.org Foundation C.I.C., "End-to-End Encryption |
               Client-Server API", 2022, <https://spec.matrix.org/v1.4/
               client-server-api/#end-to-end-encryption>.
+
+   [CSInviteApi]
+              The Matrix.org Foundation C.I.C., "POST
+              /_matrix/client/v3/rooms/:roomId/invite | Client-Server
+              API", 2022, <https://spec.matrix.org/v1.4/client-server-
+              api/#post_matrixclientv3roomsroomidinvite>.
 
    [DMLS]     Chathi, H., "Decentralised MLS", Web 
               https://gitlab.matrix.org/matrix-org/mls-ts/-
@@ -339,8 +335,12 @@ to all participating servers by default.
    [MxSpec]   The Matrix.org Foundation C.I.C., "Matrix Specification |
               v1.4", 2022, <https://spec.matrix.org/v1.4/>.
 
-   [SSApi]    The Matrix.org Foundation C.I.C., "Federation API", 2022,
-              <https://spec.matrix.org/v1.4/server-server-api/>.
+   [SSInviteApi]
+              The Matrix.org Foundation C.I.C., "POST
+              /_matrix/federation/v2/invite/:roomId/:eventId |
+              Federation API", 2022, <https://spec.matrix.org/v1.4/
+              server-server-
+              api/#put_matrixfederationv2inviteroomideventid>.
 
    [SSStateResAlgo]
               The Matrix.org Foundation C.I.C., "Room State Resolution |
