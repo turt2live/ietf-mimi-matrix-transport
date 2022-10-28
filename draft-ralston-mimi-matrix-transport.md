@@ -179,41 +179,41 @@ Practically, this looks like:
 
 ~~~
 
-Room on server A sent message A1,       The same room on server B has received
-then sent A2, and received C1 from      A1 and A2, but not C1, e.g. due to
-server C which raced with A2 and so     network connectivity problems.
-follows A1.
-     __________                                              __________
-    '          '                                            '          '
-    '    A1    '                                            '    A1    '
-    '   /  \   '                                            '   /      '
-    '  A2  C1  '                                            '  A2      '
-    '__________'                                            '__________'
+Room on server A sent message A1,     The same room on server B has
+then sent A2, and received C1 from    received A1 and A2, but not C1,
+server C which raced with A2 and so   e.g. due to network connectivity
+follows A1.                            problems.
+   __________                                              __________
+  '          '                                            '          '
+  '    A1    '                                            '    A1    '
+  '   /  \   '                                            '   /      '
+  '  A2  C1  '                                            '  A2      '
+  '__________'                                            '__________'
 
 Server A sends another message, A3:
 
-     __________                                              __________
-    '          '                                            '          '
-    '    A1    '                                            '    A1    '
-    '   /  \   '                                            '   /      '
-    '  A2  C1  '------------------------------------------->'  A2   ?  '
-    '   \  /   '  HTTP PUT                                  '   \  /   '
-    '    A3    '  /_matrix/federation/v1/send/{txnId}       '    A3    '
-    '__________'  A3                                        '__________'
+   __________                                              __________
+  '          '                                            '          '
+  '    A1    '                                            '    A1    '
+  '   /  \   '                                            '   /      '
+  '  A2  C1  '------------------------------------------->'  A2   ?  '
+  '   \  /   '  HTTP PUT                                  '   \  /   '
+  '    A3    '  /_matrix/federation/v1/send/{txnId}       '    A3    '
+  '__________'  A3                                        '__________'
 
-Server B sees that A3 refers to the missing event C1, and pulls it from A:
+Server B sees that A3 refers to missing event C1, and pulls it from A:
 
-     __________                                              __________
-    '          '                                            '          '
-    '    A1    '                                            '    A1    '
-    '   /  \   '                                            '   /  \   '
-    '  A2  C1  '<-------------------------------------------'  A2   C1 '
-    '   \  /   '  HTTP GET                                  '   \  /   '
-    '    A3    '  /_matrix/federation/v1/get_missing_events '    A3    '
-    '__________'  C1                                        '__________'
+   __________                                              __________
+  '          '                                            '          '
+  '    A1    '                                            '    A1    '
+  '   /  \   '                                            '   /  \   '
+  '  A2  C1  '<-------------------------------------------'  A2   C1 '
+  '   \  /   '  HTTP GET                                  '   \  /   '
+  '    A3    '  /_matrix/federation/v1/get_missing_events '    A3    '
+  '__________'  C1                                        '__________'
 
-Typically, get_missing_events isn't needed, given servers push all events
-to all participating servers by default.
+Typically, get_missing_events isn't needed, given servers push all
+events to all participating servers by default.
 
 ~~~
 Figure 1
